@@ -452,3 +452,6 @@ coord_cartesian(xlim = c(-0.5, 5), ylim = c(0, 1.75))
 
 ggsave('../figures/20180111_hmUseq_oligos_F8-6-M7v2-25pct-nooxctrl-1_sample3_F8-6-M7v2-25pct-nooxctrl-2_sample2_F8-6-M7v2-25pct-nooxctrl-3_sample2_F8-6-M7v2-25pct-ox-1_sample2_F8-6-M7v2-25pct-ox-2_sample2_F8-6-M7v2-25pct-ox-3_sample1_100x.pdf', width = 12, height = 12, units= 'cm')
 ```
+
+<img src="figures/20180111_hmUseq_oligos_F8-6-M7v2-25pct-nooxctrl-1_sample3_F8-6-M7v2-25pct-nooxctrl-2_sample2_F8-6-M7v2-25pct-nooxctrl-3_sample2_F8-6-M7v2-25pct-ox-1_sample2_F8-6-M7v2-25pct-ox-2_sample2_F8-6-M7v2-25pct-ox-3_sample1_100x.png" width="400">
+
