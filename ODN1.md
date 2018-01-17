@@ -1,22 +1,19 @@
 ## Software requirements
 Essential:
-- Standard unix tools: zcat, paste, awk, tr ...
+- Standard unix tools: zcat, paste, awk, tr, sort, sed ...
 - [FastQC v0.11.3](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
 - [cutadapt v1.12](http://cutadapt.readthedocs.io/en/stable/guide.html)
+- [getInsertAndBarcode.py](getInsertAndBarcode.py)
+- [bedtools v2.26.0](http://bedtools.readthedocs.io/en/latest/)
+- [seqtk 1.0-r45](https://github.com/lh3/seqtk)
 - [bwa v0.7.15-r1140](http://bio-bwa.sourceforge.net/)
 - [samtools v1.3.1](http://samtools.sourceforge.net/)
-- [bedtools v2.26.0](http://bedtools.readthedocs.io/en/latest/)
 - [pysamstats v1.0.1](https://github.com/alimanfoo/pysamstats) (pysam 0.11.2.2)
+- [tableCat.py](https://github.com/dariober/bioinformatics-cafe/blob/master/tableCat/tableCat.py)
 - [python v2.7.12](https://www.python.org/). Libraries:
-  - [os](https://docs.python.org/2/library/os.html)
-- [R v3.3.2](https://www.r-project.org/). Libraries:
-  - [data.table](https://cran.r-project.org/web/packages/data.table/index.html)
-  - [edgeR](http://bioconductor.org/packages/release/bioc/html/edgeR.html)
-  - [ggplot2](http://ggplot2.org/)
-  - [ggrepel](https://cran.r-project.org/web/packages/ggrepel/index.html)
 
 Optional:
-- [slurm](https://slurm.schedmd.com/overview.html) cluster job scheduling system
+- [lsf](https://www.ibm.com/us-en/marketplace/hpc-workload-management) cluster job scheduling system
 
 
 
@@ -58,7 +55,7 @@ Now we need to get the random barcode and put it in the header. We also deduplic
 for fq in fk*.fw.fq
 do
     bname=`basename $fq .fq`
-    python ~/Tritume/getInsertAndBarcode.py $fq \
+    python getInsertAndBarcode.py $fq \
     | paste  - - - - \
     | sort -k1,1 \
     | groupBy -g 1 -c 2,3,4 -o first,first,first \
@@ -70,7 +67,7 @@ for fq in fk*.rc.fq
 do
     bname=`basename $fq .fq`
     seqtk seq -r $fq \
-    | python ~/Tritume/getInsertAndBarcode.py - \
+    | python getInsertAndBarcode.py - \
     | paste  - - - - \
     | sort -k1,1 \
     | groupBy -g 1 -c 2,3,4 -o first,first,first \
@@ -79,3 +76,36 @@ do
 done
 ```
 
+
+
+## Alignment
+
+### Prepare and index reference template
+
+```bash
+echo '>mod10' > mod10.fa
+echo 'ATCGAGAATCCCGGTGCCGATACCHACTCTTGHAGAA' >> mod10.fa
+bwa index mod10.fa
+```
+
+
+## Align and count 
+
+```bash
+for fq in fk*.ins.fq
+do
+    bname=`basename $fq .fq`
+    bsub "
+    bwa mem -k 5 -T 10 -L 200 mod10.fa $fq \
+    | samtools sort -o - -O bam -T aln.tmp.bam > ${bname}.bam &&
+    samtools index ${bname}.bam &&
+    pysamstats -D 1000000 -d -f mod10.fa --type variation_strand ${bname}.bam > ${bname}.var.txt"
+done
+```
+
+
+## Prepare data files
+
+```bash
+tableCat.py -H -i *.ins.var.txt -r '.ins.var.txt' | sed 's/\r//g' > mod10.20160725.txt
+```
