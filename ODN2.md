@@ -74,7 +74,7 @@ Optional:
 Adding the sequencing run id (180109_M00886_0188_000000000_BGP8K) to the file name.
 
 ```bash
-cd fastq # fastq = directory containing the six *.fastq.gz files shown above
+cd fastq # fastq = directory containing the *.fastq.gz files shown above
 
 id=180109_M00886_0188_000000000_BGP8K # or 170911-BF7LK-47486441 - see above
 
