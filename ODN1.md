@@ -89,7 +89,7 @@ bwa index mod10.fa
 ```
 
 
-## Align and count 
+### Align and count 
 
 ```bash
 for fq in fk*.ins.fq
@@ -104,7 +104,7 @@ done
 ```
 
 
-## Prepare data files
+### Prepare data files
 
 ```bash
 tableCat.py -H -i *.ins.var.txt -r '.ins.var.txt' | sed 's/\r//g' > mod10.20160725.txt
