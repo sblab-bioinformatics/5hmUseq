@@ -4,7 +4,7 @@
            *     *             
 positions  35    43
 
-* = 12% level of incorporation hmU/T
+* = 0, 12, 25 and 50% level of incorporation hmU/T
 
 in the reverse strand - check T->C conversion:
 
@@ -17,13 +17,31 @@ in the forwad strand - check A->G conversion:
 - T --(hmU-seq)--> T --(read as)--> A
 ```
 
+- 0% incorporation libraries:
+  - F7-148-0-1   ox   id:170911-BF7LK-47486441
+  - F7-148-0-2   ox   id:170911-BF7LK-47486441
+  - F7-148-0-3   ox   id:170911-BF7LK-47486441
+
+- 12% incorporation libraries:
+  - F7-148-12-1   ox   id:170911-BF7LK-47486441
+  - F7-148-12-2   ox   id:170911-BF7LK-47486441
+  - F7-148-12-3   ox   id:170911-BF7LK-47486441
+
 - 25% incorporation libraries:
-  - F8-6-M7v2-25pct-ox-1   ox
-  - F8-6-M7v2-25pct-ox-2   ox
-  - F8-6-M7v2-25pct-ox-3   ox
-  - F8-6-M7v2-25pct-nooxctrl-1   nooxctrl
-  - F8-6-M7v2-25pct-nooxctrl-2   nooxctrl
-  - F8-6-M7v2-25pct-nooxctrl-3   nooxctrl
+  - F7-148-25-1   ox   id:170911-BF7LK-47486441
+  - F7-148-25-2   ox   id:170911-BF7LK-47486441
+  - F7-148-25-3   ox   id:170911-BF7LK-47486441
+  - F8-6-M7v2-25pct-ox-1   ox   id:180109_M00886_0188_000000000_BGP8K
+  - F8-6-M7v2-25pct-ox-2   ox   id:180109_M00886_0188_000000000_BGP8K
+  - F8-6-M7v2-25pct-ox-3   ox   id:180109_M00886_0188_000000000_BGP8K
+  - F8-6-M7v2-25pct-nooxctrl-1   nooxctrl   id:180109_M00886_0188_000000000_BGP8K
+  - F8-6-M7v2-25pct-nooxctrl-2   nooxctrl   id:180109_M00886_0188_000000000_BGP8K
+  - F8-6-M7v2-25pct-nooxctrl-3   nooxctrl   id:180109_M00886_0188_000000000_BGP8K
+
+- 50% incorporation libraries:
+  - F7-148-50-1   ox   id:170911-BF7LK-47486441
+  - F7-148-50-2   ox   id:170911-BF7LK-47486441
+  - F7-148-50-3   ox   id:170911-BF7LK-47486441
 
 
 
@@ -58,9 +76,11 @@ Adding the sequencing run id (180109_M00886_0188_000000000_BGP8K) to the file na
 ```bash
 cd fastq # fastq = directory containing the six *.fastq.gz files shown above
 
+id=180109_M00886_0188_000000000_BGP8K # or 170911-BF7LK-47486441 - see above
+
 for fastq in *.fastq.gz
 do
-  mv $fastq 180109_M00886_0188_000000000_BGP8K_$fastq
+  mv $fastq $id_$fastq
 done
 ```
 
@@ -126,13 +146,79 @@ done
 
 
 
-## Sample bam files (100x)
+## Counting (id:170911-BF7LK-47486441 files)
+
+### pysamstats
 
 ```bash
-cd bam
+cd ../bam
+mkdir ../pysamstats
+
+ref=../reference/template.fa
+
+for bam in 170911-BF7LK-47486441*.bam
+do
+  bname=${bam%.bam}
+  sbatch -J $bname -o ../pysamstats/$bname.log --mem 8192 --wrap "pysamstats --type variation_strand -d -D 1000000 -f $ref $bam > ../pysamstats/$bname.txt"
+done
+```
+
+
+### tables
+
+Create output directory:
+
+```bash
+mkdir ../tables
+```
+
+Parsing pysamstats output to extract A_rev and G_rev:
+
+```python
+import os
+
+files = [f for f in os.listdir("../pysamstats/") if '.txt' in f]
+
+file_pos_counts = {}
+
+for f in files:
+  id = f.split('_')[1]
+  ifile = open("../pysamstats/%s" % f , 'r')
+  ilines = ifile.readlines()
+  ifile.close()
+  for line in ilines[1:]:
+    fields = line.split()
+    pos = fields[1]
+    base = fields[2]
+    a_rev = fields[35]
+    g_rev = fields[53]
+    if base == 'A':
+      file_pos_counts[(id+'-T', pos)] = a_rev
+      file_pos_counts[(id+'-C', pos)] = g_rev
+
+
+inc = ['0', '6', '12', '25', '50']
+
+for i in inc:
+  columns = sorted(list(set([pair[0] for pair in file_pos_counts.keys() if '-%s-' % i in pair[0]])))
+  rows = sorted(list(set([pair[1] for pair in file_pos_counts.keys() if '-%s-' % i in pair[0]])))
+  ofile = open("../tables/%s.txt" % i, "w")
+  ofile.write("pos\t" + "\t".join(columns) + "\n")
+  for r in rows:
+    ofile.write("%s\t" % r)
+    ofile.write("\t".join([file_pos_counts[(c,r)] for c in columns]) + "\n")
+  ofile.close()
+```
+
+
+
+## Sample bam files to 100x (id:180109_M00886_0188_000000000_BGP8K files)
+
+```bash
+cd ../bam
 mkdir 100x
 
-for bam in *.bam
+for bam in 180109_M00886_0188_000000000_BGP8K*.bam
 do
   bname=${bam%.bam}
   for i in `seq 1 3`
@@ -146,7 +232,7 @@ done
 
 
 
-## Counting
+## Counting (id:180109_M00886_0188_000000000_BGP8K files)
 
 ### pysamstats
 
@@ -166,24 +252,18 @@ done
 
 ### tables
 
-Create output directory:
-
-```bash
-mkdir ../tables
-```
-
 Parsing pysamstats output to extract A_rev and G_rev:
 
 ```python
 import os
 
-files = [f for f in os.listdir("pysamstats/100x") if '.txt' in f]
+files = [f for f in os.listdir("../pysamstats/100x") if '.txt' in f]
 
 file_pos_counts = {}
 
 for f in files:
   id = "_".join([f.split('_')[-3], f.split('_')[-1].replace(".txt", "")])
-  ifile = open("pysamstats/100x/%s" % f , 'r')
+  ifile = open("../pysamstats/100x/%s" % f , 'r')
   ilines = ifile.readlines()
   ifile.close()
   for line in ilines[1:]:
@@ -202,7 +282,7 @@ inc = [('12', '12pct'), ('25', '25pct')]
 for i in inc:
   columns = sorted(list(set([pair[0] for pair in file_pos_counts.keys() if ('-%s-' % i[0] in pair[0]) or ('-%s-' % i[1] in pair[0])])))
   rows = sorted(list(set([pair[1] for pair in file_pos_counts.keys() if ('-%s-' % i[0] in pair[0]) or ('-%s-' % i[1] in pair[0])])))
-  ofile = open("tables/%s_e2_100x.txt" % i[0], "w")
+  ofile = open("../tables/%s_e2_100x.txt" % i[0], "w")
   ofile.write("pos\t" + "\t".join(columns) + "\n")
   for r in rows:
     ofile.write("%s\t" % r)
@@ -214,7 +294,7 @@ for i in inc:
 
 ## Analysis
 
-Having a look at 25_e2_100x.txt for now:
+Having a look at 25_e2_100x.txt:
 
 ```r
 library(data.table)
@@ -230,7 +310,7 @@ options(width = 300)
 #######
 
 # Load data
-data_25 <- fread("25_e2_100x.txt")
+data_25 <- fread("../tables/25_e2_100x.txt")
 
 # Create DGEList object
 data_25 <- DGEList(counts = data_25[,-1], group = c("c", "c", "c", "c", "c", "c", "c", "c", "c", "c", "c", "c", "c", "c", "c", "c", "c", "c", "t", "t", "t", "t", "t", "t", "t", "t", "t", "t", "t", "t", "t", "t", "t", "t", "t", "t"), samples = data.frame(t2c = rep(c("C", "T"), 18)), genes = data_25[,1])
@@ -286,7 +366,7 @@ ylab(expression("-log"[10]*"FDR")) +
 geom_text_repel(data = data.table(as.data.frame(topTags(data_25_m_lrt, n = Inf))), aes(label = pos), size = 4, force = 1, segment.size = 0) +
 coord_cartesian(xlim = c(-4, 4), ylim = c(0, 5))
 
-ggsave('figures/20180111_hmUseq_oligos_F8-6-M7v2-25pct_100x.png', width = 12, height = 12, units= 'cm')
+ggsave('../figures/20180111_hmUseq_oligos_F8-6-M7v2-25pct_100x.png', width = 12, height = 12, units= 'cm')
 
 
 
@@ -302,7 +382,7 @@ ggsave('figures/20180111_hmUseq_oligos_F8-6-M7v2-25pct_100x.png', width = 12, he
 #F8-6-M7v2-25pct-ox-3_sample1 32,33
 
 # Load data
-data_25 <- fread("tables/25_e2_100x.txt")
+data_25 <- fread("../tables/25_e2_100x.txt")
 
 # Create DGEList object
 data_25 <- DGEList(counts = data_25[,c(6,7,10,11,16,17,22,23,28,29,32,33)], group = c("c", "c", "c", "c", "c", "c", "t", "t", "t", "t", "t", "t"), samples = data.frame(t2c = rep(c("C", "T"), 6)), genes = data_25[,1])
@@ -359,7 +439,7 @@ ylab(expression("-log"[10]*"FDR")) +
 geom_text_repel(data = data.table(as.data.frame(topTags(data_25_m_lrt, n = Inf))), aes(label = pos), size = 4, force = 1, segment.size = 0) +
 coord_cartesian(xlim = c(-5, 5), ylim = c(0, 2))
 
-ggsave('figures/20180111_hmUseq_oligos_F8-6-M7v2-25pct-nooxctrl-1_sample3_F8-6-M7v2-25pct-nooxctrl-2_sample2_F8-6-M7v2-25pct-nooxctrl-3_sample2_F8-6-M7v2-25pct-ox-1_sample2_F8-6-M7v2-25pct-ox-2_sample2_F8-6-M7v2-25pct-ox-3_sample1_100x.png', width = 12, height = 12, units= 'cm')
+ggsave('../figures/20180111_hmUseq_oligos_F8-6-M7v2-25pct-nooxctrl-1_sample3_F8-6-M7v2-25pct-nooxctrl-2_sample2_F8-6-M7v2-25pct-nooxctrl-3_sample2_F8-6-M7v2-25pct-ox-1_sample2_F8-6-M7v2-25pct-ox-2_sample2_F8-6-M7v2-25pct-ox-3_sample1_100x.png', width = 12, height = 12, units= 'cm')
 
 # Volcano plot in pdf - changing axes coordinates
 gg <- ggplot(data = data.table(as.data.frame(topTags(data_25_m_lrt, n = Inf))), aes(x = logFC, y = -log10(FDR))) +
@@ -370,5 +450,5 @@ ylab(expression("-log"[10]*"FDR")) +
 geom_text_repel(data = data.table(as.data.frame(topTags(data_25_m_lrt, n = Inf))), aes(label = pos), size = 4, force = 1, segment.size = 0) +
 coord_cartesian(xlim = c(-0.5, 5), ylim = c(0, 1.75))
 
-ggsave('figures/20180111_hmUseq_oligos_F8-6-M7v2-25pct-nooxctrl-1_sample3_F8-6-M7v2-25pct-nooxctrl-2_sample2_F8-6-M7v2-25pct-nooxctrl-3_sample2_F8-6-M7v2-25pct-ox-1_sample2_F8-6-M7v2-25pct-ox-2_sample2_F8-6-M7v2-25pct-ox-3_sample1_100x.pdf', width = 12, height = 12, units= 'cm')
+ggsave('../figures/20180111_hmUseq_oligos_F8-6-M7v2-25pct-nooxctrl-1_sample3_F8-6-M7v2-25pct-nooxctrl-2_sample2_F8-6-M7v2-25pct-nooxctrl-3_sample2_F8-6-M7v2-25pct-ox-1_sample2_F8-6-M7v2-25pct-ox-2_sample2_F8-6-M7v2-25pct-ox-3_sample1_100x.pdf', width = 12, height = 12, units= 'cm')
 ```
