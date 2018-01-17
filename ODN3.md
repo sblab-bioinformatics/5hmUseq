@@ -10,7 +10,7 @@
 
 ## Software requirements
 Essential:
-- Standard unix tools: mv, mkdir, cd, cp, echo ...
+- Standard unix tools
 - [FastQC v0.11.3](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
 - [cutadapt v1.12](http://cutadapt.readthedocs.io/en/stable/guide.html)
 - [python v2.7.12](https://www.python.org/). Libraries:
