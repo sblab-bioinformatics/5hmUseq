@@ -1,3 +1,33 @@
+- Normal PCR, dATP dilution 1   rep1   fk457
+- Normal PCR, dATP dilution 1   rep2   fk458
+- Normal PCR, dATP dilution 1   rep3   fk187
+
+- Bst, 37 deg Tpol, 2 mM MgSO4, dATP dilution 500   rep1   fk382
+- Bst, 37 deg Tpol, 2 mM MgSO4, dATP dilution 500   rep2   fk391
+- Bst, 37 deg Tpol, 2 mM MgSO4, dATP dilution 500   rep3   fk173
+
+- Bst, 37 deg, Tpol, 10 mM MgSO4, dATP dilution 500   rep1   fk386
+- Bst, 37 deg, Tpol, 10 mM MgSO4, dATP dilution 500   rep2   fk449
+- Bst, 37 deg, Tpol, 10 mM MgSO4, dATP dilution 500   rep3   fk450
+
+- Bst, 37 deg, Tpol, 10 mM MgSO4, dATP dilution 50   rep1   fk380
+- Bst, 37 deg, Tpol, 10 mM MgSO4, dATP dilution 50   rep2   fk381
+
+- Klenow exo-, 37 deg, Tpol, dATP dilution 500   rep1   fk419
+- Klenow exo-, 37 deg, Tpol, dATP dilution 500   rep2   fk420
+
+- VentR exo-, 37deg, Tpol, 10 mM MgSO4, dATP dilution 500   rep1   fk423
+- VentR exo-, 37deg, Tpol, 10 mM MgSO4, dATP dilution 500   rep2   fk424
+
+- Sulfolobus pol, 37deg, Tpol, 10 mM MgSO4, dATP dilution 500   rep1   fk459
+- Sulfolobus pol, 37deg, Tpol, 10 mM MgSO4, dATP dilution 500   rep3   fk461
+
+- Bst, 37 deg, Tpol, 10 mM MgSO4, noox ctrl, dATP dilution 500   rep1   fk421
+- Bst, 37 deg, Tpol, 10 mM MgSO4, noox ctrl, dATP dilution 500   rep2   fk422
+- Bst, 37 deg, Tpol, 10 mM MgSO4, noox ctrl, dATP dilution 500   rep3   fk277
+
+
+
 ## Software requirements
 Essential:
 - Standard unix tools: zcat, paste, awk, tr, sort, sed ...
