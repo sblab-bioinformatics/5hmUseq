@@ -28,12 +28,9 @@ in the forwad strand - check A->G conversion:
   - F7-148-12-3   ox   id:170911-BF7LK-47486441   (Fig. 2a)
 
 - 25% incorporation libraries:
-  - F7-148-25-1   ox   id:170911-BF7LK-47486441   (Fig. 2a)
-  - F7-148-25-2   ox   id:170911-BF7LK-47486441   (Fig. 2a)
-  - F7-148-25-3   ox   id:170911-BF7LK-47486441   (Fig. 2a)
-  - F8-6-M7v2-25pct-ox-1   ox   id:180109_M00886_0188_000000000_BGP8K   (Fig. 2b)
-  - F8-6-M7v2-25pct-ox-2   ox   id:180109_M00886_0188_000000000_BGP8K   (Fig. 2b)
-  - F8-6-M7v2-25pct-ox-3   ox   id:180109_M00886_0188_000000000_BGP8K   (Fig. 2b)
+  - F8-6-M7v2-25pct-ox-1   ox   id:180109_M00886_0188_000000000_BGP8K   (Fig. 2a and 2b)
+  - F8-6-M7v2-25pct-ox-2   ox   id:180109_M00886_0188_000000000_BGP8K   (Fig. 2a and 2b)
+  - F8-6-M7v2-25pct-ox-3   ox   id:180109_M00886_0188_000000000_BGP8K   (Fig. 2a and 2b)
   - F8-6-M7v2-25pct-nooxctrl-1   nooxctrl   id:180109_M00886_0188_000000000_BGP8K   (Fig. 2b)
   - F8-6-M7v2-25pct-nooxctrl-2   nooxctrl   id:180109_M00886_0188_000000000_BGP8K   (Fig. 2b)
   - F8-6-M7v2-25pct-nooxctrl-3   nooxctrl   id:180109_M00886_0188_000000000_BGP8K   (Fig. 2b)
