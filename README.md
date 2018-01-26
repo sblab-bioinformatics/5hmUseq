@@ -3,9 +3,7 @@ This repository contains details about data access and computational analysis fo
 
 ## Data
 
-All the sequencing data have been deposited in the [ArrayExpress database](https://www.ebi.ac.uk/arrayexpress/) at EMBL-EBI under accession number ??? (currently reviewer access only):
-
-(include link)
+All the sequencing data have been deposited in the [ArrayExpress database](https://www.ebi.ac.uk/arrayexpress/) at EMBL-EBI under accession number [E-MTAB-6456](https://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-6456) (currently reviewer access only).
 
 
 ## Code
