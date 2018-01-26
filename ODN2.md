@@ -54,10 +54,10 @@ Essential:
 - [python v2.7.12](https://www.python.org/). Libraries:
   - [os](https://docs.python.org/2/library/os.html)
 - [R v3.3.2](https://www.r-project.org/). Libraries:
-  - [data.table](https://cran.r-project.org/web/packages/data.table/index.html)
-  - [edgeR](http://bioconductor.org/packages/release/bioc/html/edgeR.html)
-  - [ggplot2](http://ggplot2.org/)
-  - [ggrepel](https://cran.r-project.org/web/packages/ggrepel/index.html)
+  - [data.table v1.10.4](https://cran.r-project.org/web/packages/data.table/index.html)
+  - [edgeR v3.16.5](http://bioconductor.org/packages/release/bioc/html/edgeR.html)
+  - [ggplot2 v2.2.1](http://ggplot2.org/)
+  - [ggrepel v0.6.5](https://cran.r-project.org/web/packages/ggrepel/index.html)
 
 Optional:
 - [slurm](https://slurm.schedmd.com/overview.html) cluster job scheduling system
