@@ -452,3 +452,14 @@ ggsave('../figures/20180111_hmUseq_oligos_F8-6-M7v2-25pct-nooxctrl-1_sample3_F8-
 
 <img src="figures/20180111_hmUseq_oligos_F8-6-M7v2-25pct-nooxctrl-1_sample3_F8-6-M7v2-25pct-nooxctrl-2_sample2_F8-6-M7v2-25pct-nooxctrl-3_sample2_F8-6-M7v2-25pct-ox-1_sample2_F8-6-M7v2-25pct-ox-2_sample2_F8-6-M7v2-25pct-ox-3_sample1_100x.png" width="400">
 
+
+
+## Note
+
+In Figure S1b, the nucleotide indices (i) in the reference template have been reversed (80-i) in order to improve visualisation upon 5hmU / T incorporation:
+
+```
+fwd:                              35      43      51    ...
+GCTCGCTTTGTTGGTTTCCTTGTTCTCTGTGCCCACTGCCTGACGGGCGGAAAGCAGCGCGAGCAAGCGAGACAGGACAC
+rev:                              46      38      30    ...      
+```
