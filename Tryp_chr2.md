@@ -19,6 +19,8 @@ Essential:
   - [limma v3.30.11](http://bioconductor.org/packages/release/bioc/html/limma.html)
   - [ggplot2 v2.2.1](http://ggplot2.org/)
 - [tableCat.py](https://github.com/dariober/bioinformatics-cafe/blob/master/tableCat/tableCat.py)
+- [bedtools v2.26.0](http://bedtools.readthedocs.io/en/latest/)
+- [GAT](https://gat.readthedocs.io/en/latest/)
 
 Optional:
 - [slurm](https://slurm.schedmd.com/overview.html) cluster job scheduling system
@@ -41,6 +43,7 @@ Optional:
 #### Quality check
 
 ```bash
+cd fastq
 mkdir ../fastqc
 
 for fq in *.fastq.gz
@@ -252,7 +255,7 @@ do
 done
 ```
 
-#### Defining significant sites
+#### Defining significant 5hmU sites
 
 ```r
 library(data.table)
@@ -325,12 +328,7 @@ tte_hmUseq_nooxctrl[order(P.Value)][logFC > 0 & adj.P.Val < 0.1 & hmUseq_avg > 8
 tte_hmUseq_nooxctrl[order(P.Value)][logFC > 0 & adj.P.Val < 0.1 & hmUseq_avg > 8] # 2975
 tte_hmUseq_nooxctrl[order(P.Value)][logFC > 0 & adj.P.Val < 0.1 & hmUseq_avg > 8 & nooxctrl_avg > 90] # 41
 
-tte_hmUseq_nooxctrl_adjpval0.1_s_5 <- tte_hmUseq_nooxctrl[order(P.Value)][logFC > 0 & adj.P.Val < 0.1 & hmUseq_avg > 5 & nooxctrl_avg < 5]
-tte_hmUseq_nooxctrl_adjpval0.1_s_6 <- tte_hmUseq_nooxctrl[order(P.Value)][logFC > 0 & adj.P.Val < 0.1 & hmUseq_avg > 6 & nooxctrl_avg < 5]
-tte_hmUseq_nooxctrl_adjpval0.1_s_7 <- tte_hmUseq_nooxctrl[order(P.Value)][logFC > 0 & adj.P.Val < 0.1 & hmUseq_avg > 7 & nooxctrl_avg < 5]
 tte_hmUseq_nooxctrl_adjpval0.1_s_8 <- tte_hmUseq_nooxctrl[order(P.Value)][logFC > 0 & adj.P.Val < 0.1 & hmUseq_avg > 8 & nooxctrl_avg < 5]
-tte_hmUseq_nooxctrl_adjpval0.1_s_9 <- tte_hmUseq_nooxctrl[order(P.Value)][logFC > 0 & adj.P.Val < 0.1 & hmUseq_avg > 9 & nooxctrl_avg < 5]
-tte_hmUseq_nooxctrl_adjpval0.1_s_10 <- tte_hmUseq_nooxctrl[order(P.Value)][logFC > 0 & adj.P.Val < 0.1 & hmUseq_avg > 10 & nooxctrl_avg < 5]
 
 # Save significant sites in bed files
 tte_hmUseq_nooxctrl_adjpval0.05_s_8[, start := as.integer(pos-1)]
@@ -338,8 +336,29 @@ tte_hmUseq_nooxctrl_adjpval0.05_s_8[, end := as.integer(start+1)]
 
 write.table(tte_hmUseq_nooxctrl_adjpval0.05_s_8[, c("chrom", "start", "end", "logFC", "P.Value", "adj.P.Val", "ox_avg", "noox_avg")], "../bed/hmUseq_nooxctrl_nocountfilter_adjpval0.05_hmUseqavg8_nooxctrlavg5.bed", row.names = FALSE, col.names = FALSE, sep = '\t', quote = FALSE)
 system('bedtools sort -i ../bed/hmUseq_nooxctrl_nocountfilter_adjpval0.05_hmUseqavg8_nooxctrlavg5.bed > ../bed/hmUseq_nooxctrl_nocountfilter_adjpval0.05_hmUseqavg8_nooxctrlavg5.sorted.bed')
-
 ```
+
+#### Extract 5hmU sites in chromosome 2
+
+```bash
+cd  bed
+
+grep "Tb927_02_v5.1" hmUseq_nooxctrl_nocountfilter_adjpval0.1_hmUseqavg8_nooxctrlavg5.sorted.bed | wc -l # 161
+grep "Tb927_02_v5.1" hmUseq_nooxctrl_nocountfilter_adjpval0.1_hmUseqavg8_nooxctrlavg5.sorted.bed | cut -f1-3 > Tryp_chr2_5hmUsites.bed
+head Tryp_chr2_5hmUsites.bed
+#Tb927_02_v5.1	913	914
+#Tb927_02_v5.1	11804	11805
+#Tb927_02_v5.1	17557	17558
+#Tb927_02_v5.1	31160	31161
+#Tb927_02_v5.1	31192	31193
+#Tb927_02_v5.1	35073	35074
+#Tb927_02_v5.1	51242	51243
+#Tb927_02_v5.1	51714	51715
+#Tb927_02_v5.1	54756	54757
+#Tb927_02_v5.1	57709	57710
+```
+
+
 
 
 
@@ -347,9 +366,55 @@ system('bedtools sort -i ../bed/hmUseq_nooxctrl_nocountfilter_adjpval0.05_hmUseq
 
 ### Processing sequencing reads
 
-Under construction ..
+#### Quality check
+
+```bash
+cd fastq
+
+for fq in *.fastq.gz
+do
+  bname=${fq%_L001_R1_001.fastq.gz}
+  sbatch -J $bname -o ../fastqc/$bname.log --mem 4096 --wrap "fastqc --noextract --nogroup -q -o ../fastqc $fq"
+done
+```
+
+#### Trim Illumina adaptors
+
+```bash
+for fq in *.fastq.gz
+do
+  bname=${fq%_L001_R1_001.fastq.gz}
+  sbatch -J $bname -o ../fastq_trimmed/$bname.log --mem 4096 --wrap "cutadapt -a AGATCGGAAGAGC -m 10 -o ../fastq_trimmed/$fq $fq > ../fastq_trimmed/$bname.txt"
+done
+```
+
 
 ### Alignment
 
-Under construction ..
+#### Align, sort, mark duplicates and index
 
+
+
+
+
+## Intersection of 5hmU sites and 5hmU regions: simulations
+
+### Prepare annotations and workspace
+
+```bash
+cd annotation
+awk -v OFS="\t" '{print $1, $2, $3, "hmU"}' ../bed/Tryp_chr2_5hmUsites.bed > Tryp_chr2_5hmUsites.bed
+
+cd ../bam
+grep "Tb927_02_v5.1" ../reference/TriTrypDB-9.0_TbruceiTREU927_Genome.fasta.fai | cut -f1-2 | awk -v OFS="\t" '{print $1, 1, $2}' > mappable_2.bed
+```
+
+
+### Run overlap simulation
+
+```bash
+cd annotation
+mkdir ../gat
+
+nohup gat-run.py -a Tryp_chr2_5hmUsites.bed -s Tryp_chr2_5hmUregions.bed -w ../bam/mappable_2.bed --ignore-segment-tracks -n 10000 -t 20 -L ../gat/Tryp_chr2_5hmUregions.log > ../gat/Tryp_chr2_5hmUregions.out &
+```
