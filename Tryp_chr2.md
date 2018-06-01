@@ -21,9 +21,13 @@ Essential:
 - [tableCat.py](https://github.com/dariober/bioinformatics-cafe/blob/master/tableCat/tableCat.py)
 - [bedtools v2.26.0](http://bedtools.readthedocs.io/en/latest/)
 - [GAT](https://gat.readthedocs.io/en/latest/)
+- [Picard tools v2.8.2](https://broadinstitute.github.io/picard/)
+- [macs2 v2.1.1.20160309](https://github.com/taoliu/MACS)
+- [mergePeaks.sh](https://github.com/dariober/bioinformatics-cafe/blob/master/mergePeaks.sh)
 
 Optional:
 - [slurm](https://slurm.schedmd.com/overview.html) cluster job scheduling system
+- [lsf](https://www.ibm.com/us-en/marketplace/hpc-workload-management) cluster job scheduling system
 
 
 
@@ -391,7 +395,74 @@ done
 
 ### Alignment
 
-#### Align, sort, mark duplicates and index
+Align, sort, mark duplicates and index:
+
+```bash
+ref='reference/TriTrypDB-9.0_TbruceiTREU927_Genome.spike_5hmU_baseJ.fasta'
+
+for fq in fastq_trimmed/*.fq.gz
+do
+    bname=`basename $fq`
+    bname=${bname/.*/}    
+    bsub -w "ended(interleaveFastq.sh*)" -oo $bname.log -R "rusage[mem=16000]" "bwa mem $p -M -t 4 $ref $fq \
+    | samtools sort -@8 -o - -O bam -T bam/${bname}.tmp.bam > bam/${bname}.tmp.bam &&
+    java -Xmx2000m -jar picard.jar MarkDuplicates I=bam/${bname}.tmp.bam O=bam/${bname}.bam M=bam/${bname}.md.txt &&
+    samtools index bam/${bname}.bam"
+done
+```
+
+
+### Clean and peak calling
+
+```bash
+cd bam
+
+for bam in *.bam
+do
+    out=`basename $bam`
+    bsub "samtools view -b -q 10 -F 3844 $bam > tmp/$out"
+done
+
+ctrl="tmp/fk162_TrypBSF_fU1.bam tmp/fk163_TrypBSF_fU2.bam"
+treat="tmp/fk145_BSF1_HMU.bam tmp/fk151_BSF_b1_oxhyd.bam"
+
+for x in $treat
+do
+    name=`basename $x .bam`
+    bsub -oo $name.log -R "rusage[mem=4096]" "macs2 callpeak --nomodel --keep-dup all -p 0.00001 -g 30e6 -c $ctrl -t $x -n $name"
+done
+```
+
+
+### Consensus peaks
+
+```bash
+for x in "fk145_BSF1_HMU_peaks.narrowPeak,fk151_BSF_b1_oxhyd_peaks.narrowPeak,BSF_HMU"
+do
+    pp=`echo $x | sed 's/,/ /g' | cut -d ' ' -f 1,2`
+    id=`echo $x | sed 's/,/ /g' | cut -d ' ' -f 3`
+    mergePeaks.sh $pp | awk '$5 > 1' > $id.cns.bed
+done 
+```
+
+
+#### Extract 5hmU regions in chromosome 2
+
+```bash
+grep "Tb927_02_v5.1" BSF_HMU.cns.cut.bed | wc -l # 41
+grep "Tb927_02_v5.1" BSF_HMU.cns.cut.bed | cut -f1-3 > Tryp_chr2_5hmUregions.bed
+head Tryp_chr2_5hmUregions.bed
+#Tb927_02_v5.1	5416	6107
+#Tb927_02_v5.1	11778	12273
+#Tb927_02_v5.1	19332	21583
+#Tb927_02_v5.1	26022	26774
+#Tb927_02_v5.1	30959	31649
+#Tb927_02_v5.1	45709	46139
+#Tb927_02_v5.1	48970	49484
+#Tb927_02_v5.1	54504	55939
+#Tb927_02_v5.1	76338	77282
+#Tb927_02_v5.1	84662	85269
+```
 
 
 
