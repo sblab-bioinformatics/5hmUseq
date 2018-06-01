@@ -43,8 +43,6 @@ done
 
 ### Quality check
 
-In `clust1-headnode`,
-
 ```bash
 mkdir ../fastqc
 
