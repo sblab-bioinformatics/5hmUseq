@@ -1,4 +1,4 @@
-This repository contains details about data access and computational analysis for the methods developed in the *submitted* manuscript (add link).
+This repository contains details about data access and computational analysis for the methods developed in our [Angewandte Chemie manuscript](https://onlinelibrary.wiley.com/doi/abs/10.1002/anie.201804046).
 
 
 ## Data
