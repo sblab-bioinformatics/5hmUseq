@@ -1,9 +1,9 @@
-This repository contains details about data access and computational analysis for the methods developed in our [Angewandte Chemie manuscript](https://onlinelibrary.wiley.com/doi/abs/10.1002/anie.201804046).
+This repository contains details about data access and computational analysis for the methods developed in our [accepted manuscript in Angewandte Chemie](https://onlinelibrary.wiley.com/doi/abs/10.1002/anie.201804046).
 
 
 ## Data
 
-All the sequencing data have been deposited in the [ArrayExpress database](https://www.ebi.ac.uk/arrayexpress/) at EMBL-EBI under accession number [E-MTAB-6456](https://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-6456) (currently reviewer access only).
+All the sequencing data have been deposited in the [ArrayExpress database](https://www.ebi.ac.uk/arrayexpress/) at EMBL-EBI under accession number [E-MTAB-6456](https://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-6456).
 
 
 ## Code
